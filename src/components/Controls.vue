@@ -1,0 +1,52 @@
+<template>
+  <div class="relative top-8 w-full flex justify-center">
+    <div class="space-x-8 text-xl bg-slate-900 bg-opacity-50 px-4 py-2 rounded-lg flex justify-between items-center shadow border border-slate-500 border-opacity-50">
+      <button @click="handlePrevious" class="button"><i class="fa fa-backward" /></button>
+      <button v-if="isPlaying" @click="pause" class="button"><i class="fa fa-pause" /></button>
+      <button v-else @click="play" class="button"><i class="fa fa-play" /></button>
+      <button @click="handleNext" class="button"><i class="fa fa-forward" /></button>
+    </div>
+  </div>
+</template>
+
+<script>
+import { inject } from 'vue';
+import { useHandleNext, useHandlePrevious } from '@/helpers/hooks';
+
+export default {
+  setup() {
+    const { play, pause, isPlaying } = inject('audio');
+    const index = inject('index');
+    const data = inject('data');
+
+    function handleNext() {
+      useHandleNext(index, data, () => {
+        play();
+      })
+    }
+
+    function handlePrevious() {
+      useHandlePrevious(index, () => {
+        play();
+      })
+    }
+
+    return {
+      play,
+      pause,
+      isPlaying,
+      handleNext,
+      handlePrevious
+    };
+  },
+}
+</script>
+
+<style lang="postcss" scoped>
+.button {
+  @apply text-white hover:text-emerald-500 transition-all duration-200 ease-out bg-opacity-75;
+}
+.button i {
+  @apply align-middle;
+}
+</style>

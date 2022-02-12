@@ -1,0 +1,95 @@
+<template>
+  <audio 
+    ref="audioRef"
+    :src="data[index].source"
+    :autoplay="isPlaying"
+    controls
+  >
+  </audio>
+  <div class="relative h-screen w-screen bg-no-repeat bg-center bg-cover" :style="{ backgroundImage: `url(${data[index].image})` }">
+    <div class="absolute top-8 left-8 space-y-2">
+      <h1 class="text-white text-4xl">{{ data[index].title }}</h1>
+      <h2 class="text-white text-2xl">{{ data[index].artist }}</h2>
+    </div>
+    <div class="absolute bottom-1/4 w-1/2 left-1/2 transform -translate-x-1/2" ref="playerRef">
+      <Tracks />
+      <ProgressBar />
+      <Controls />
+    </div>
+  </div>
+</template>
+
+<script>
+import { provide, ref } from 'vue';
+import Tracks from './Tracks.vue';
+import ProgressBar from './ProgressBar.vue';
+import Controls from './Controls.vue';
+import { useAudio, useHandleNext } from '@/helpers/hooks';
+
+export default {
+  components: {
+    Tracks,
+    ProgressBar,
+    Controls
+  },
+  setup() {
+    const index = ref(0);
+  
+    const data =  ref([
+      {
+        title: "Norman",
+        artist: "Steven Price",
+        source: "/tracks/keys-of-moon-flowing-energy.mp3",
+        image: "/images/151196.jpg"
+      },
+      {
+        title: "Comsology",
+        artist: "Stephen Barton",
+        source: "/tracks/maxkomusic-dark-ages.mp3",
+        image: "/images/166010.jpg"
+      },
+      {
+        title: "Push Through",
+        artist: "Phil Larson",
+        source: "/tracks/keys-of-moon-flowing-energy.mp3",
+        image: "/images/166013.jpg"
+      },
+      {
+        title: "Battle Cry",
+        artist: "Imagine Dragons",
+        source: "/tracks/maxkomusic-dark-ages.mp3",
+        image: "/images/166017.jpg"
+      },
+      {
+        title: "So Say We All",
+        artist: "Audiomachine",
+        source: "/tracks/scott-buckley-clarion.mp3",
+        image: "/images/166020.jpg"
+      }
+    ]);
+
+    const playerRef = ref(null);
+  
+    const audio = useAudio({
+      next: ({ play }) => useHandleNext(index, data, () => {
+        play();
+      }
+    )});
+
+    const { audioRef, isPlaying } = audio;
+
+    provide('player', playerRef);
+    provide('audio', audio);
+    provide('index', index);
+    provide('data', data);
+
+    return {
+      playerRef,
+      audioRef,
+      data,
+      index,
+      isPlaying
+    };
+  },
+}
+</script>
