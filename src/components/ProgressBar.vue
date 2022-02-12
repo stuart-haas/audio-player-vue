@@ -16,12 +16,12 @@
 
 <script>
 import { inject, computed, ref } from 'vue';
-import { useSecondsToTime, useMousePosition } from '@/helpers/hooks';
+import { useSecondsToTime, useActiveSeek, usePassiveSeek } from '@/helpers/composables';
 
 export default {
   setup() {
-    const player = inject('player');
-    const { audioRef, duration, progress, currentTime, remainingTime, play } = inject('audio');
+    const { playerRef } = inject('player');
+    const { duration, progress, currentTime, remainingTime, play, setCurrentTime } = inject('audio');
 
     const mousePosition = ref(0);
     const mouseOver = ref(false);
@@ -29,38 +29,29 @@ export default {
 
     const currentTimeToReadable = computed(() => useSecondsToTime(currentTime.value));
     const remainingTimeToReadable = computed(() => useSecondsToTime(remainingTime.value));
-    const parentOffset = computed(() => player.value.offsetLeft * 0.5);
+    const offset = computed(() => playerRef.value.offsetLeft * 0.5);
 
     function handleSeek(e) {
-      const target = e.currentTarget;
-      const position = (e.pageX - target.offsetLeft - parentOffset.value) / target.offsetWidth;
-
-      audioRef.value.currentTime = position * duration.value;
+      const { time } = usePassiveSeek(e, offset.value, duration.value);
+      setCurrentTime(time);
       play();
     }
 
-    function handleMouseOver(e) {
-      const { position, percent } = useMousePosition(e, parentOffset.value);
-      mousePosition.value = percent;
-      mouseOver.value = true;
+    const handleMouseOver = (e) => mouseUpdate(e);
 
-      if (percent > 0) {
-        activeTime.value = useSecondsToTime(position * duration.value);
-      }
-    }
-
-    function handleMouseMove(e) {
-      const { position, percent } = useMousePosition(e, parentOffset.value);
-      mousePosition.value = percent;
-      mouseOver.value = true;
-
-      if (percent > 0) {
-        activeTime.value = useSecondsToTime(position * duration.value);
-      }
-    }
+    const handleMouseMove = (e) => mouseUpdate(e);
 
     function handleMouseOut() {
       mouseOver.value = false;
+    }
+
+    function mouseUpdate(e) {
+      const { position, percent } = useActiveSeek(e, offset.value);
+      if (percent >= 0 && percent <= 100) {
+        mousePosition.value = percent;
+        mouseOver.value = true;
+        activeTime.value = useSecondsToTime(position * duration.value);
+      }
     }
 
     return {

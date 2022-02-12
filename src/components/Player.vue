@@ -1,15 +1,14 @@
 <template>
   <audio 
     ref="audioRef"
-    :src="data[index].source"
+    :src="currentTrack.source"
     :autoplay="isPlaying"
-    controls
   >
   </audio>
-  <div class="relative h-screen w-screen bg-no-repeat bg-center bg-cover" :style="{ backgroundImage: `url(${data[index].image})` }">
+  <div class="relative h-screen w-screen bg-no-repeat bg-center bg-cover" :style="{ backgroundImage: `url(${currentTrack.image})` }">
     <div class="absolute top-8 left-8 space-y-2">
-      <h1 class="text-white text-4xl">{{ data[index].title }}</h1>
-      <h2 class="text-white text-2xl">{{ data[index].artist }}</h2>
+      <h1 class="text-white text-4xl">{{ currentTrack.title }}</h1>
+      <h2 class="text-white text-2xl">{{ currentTrack.artist }}</h2>
     </div>
     <div class="absolute bottom-1/4 w-1/2 left-1/2 transform -translate-x-1/2" ref="playerRef">
       <Tracks />
@@ -24,12 +23,12 @@
 </template>
 
 <script>
-import { provide, ref } from 'vue';
+import { computed, provide, ref } from 'vue';
 import Tracks from './Tracks.vue';
 import ProgressBar from './ProgressBar.vue';
 import Controls from './Controls.vue';
 import ToolTip from './ToolTip.vue';
-import { useAudio, useHandleNext } from '@/helpers/hooks';
+import { useAudio, usePlayer, useHandleNext } from '@/helpers/composables';
 
 export default {
   components: {
@@ -74,8 +73,7 @@ export default {
       }
     ]);
 
-    const playerRef = ref(null);
-  
+    const player = usePlayer();
     const audio = useAudio({
       next: ({ play }) => useHandleNext(index, data, () => {
         play();
@@ -83,8 +81,11 @@ export default {
     )});
 
     const { audioRef, isPlaying } = audio;
+    const { playerRef } = player;
 
-    provide('player', playerRef);
+    const currentTrack = computed(() => data.value[index.value]);
+
+    provide('player', player);
     provide('audio', audio);
     provide('index', index);
     provide('data', data);
@@ -94,7 +95,8 @@ export default {
       audioRef,
       data,
       index,
-      isPlaying
+      isPlaying,
+      currentTrack
     };
   },
 }

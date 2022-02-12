@@ -11,7 +11,7 @@
 
 <script>
 import { inject } from 'vue';
-import { useHandleNext, useHandlePrevious } from '@/helpers/hooks';
+import { useHandleNext, useHandlePrevious } from '@/helpers/composables';
 
 export default {
   setup() {

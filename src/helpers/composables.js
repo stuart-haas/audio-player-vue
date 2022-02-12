@@ -1,5 +1,13 @@
 import { ref, onMounted, watch } from 'vue';
 
+export const usePlayer = () => {
+  const playerRef = ref(null);
+
+  return {
+    playerRef
+  };
+}
+
 export const useAudio = (options) => {
   const audioRef = ref(null);
   const duration = ref(null);
@@ -14,6 +22,10 @@ export const useAudio = (options) => {
 
   function pause() {
     isPlaying.value = false;
+  }
+
+  function setCurrentTime(value) {
+    audioRef.value.currentTime = value;
   }
 
   watch(isPlaying, (value) => {
@@ -50,7 +62,8 @@ export const useAudio = (options) => {
     remainingTime,
     play,
     pause,
-    isPlaying
+    isPlaying,
+    setCurrentTime
   }
 };
 
@@ -73,7 +86,15 @@ export const useSelect = (index, newIndex, done) => {
   done();
 }
 
-export const useMousePosition = (e, offset) => {
+export const usePassiveSeek = (e, offset, duration) => {
+  const target = e.currentTarget;
+  const position = (e.pageX - target.offsetLeft - offset) / target.offsetWidth;
+  const time = position * duration;
+
+  return { position, time };
+}
+
+export const useActiveSeek = (e, offset) => {
   const target = e.currentTarget;
   const position = (e.pageX - target.offsetLeft - offset) / target.offsetWidth;
   const percent = Math.abs(Math.round(position * 100));

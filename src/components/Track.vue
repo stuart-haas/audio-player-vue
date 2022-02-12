@@ -11,7 +11,7 @@
 
 <script>
 import { inject } from 'vue';
-import { useSelect } from '@/helpers/hooks';
+import { useSelect } from '@/helpers/composables';
 
 export default {
   props: {
@@ -20,11 +20,11 @@ export default {
   },
   setup(props) {
     const index = inject('index');
-    const { play, audioRef } = inject('audio');
+    const { play, setCurrentTime } = inject('audio');
 
     function handleSelect() {
       useSelect(index, props.index, () => {
-        audioRef.value.currentTime = 0;
+        setCurrentTime(0);
         play();
       });
     }
