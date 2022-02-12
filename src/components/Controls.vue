@@ -44,7 +44,7 @@ export default {
 
 <style lang="postcss" scoped>
 .button {
-  @apply text-white hover:text-emerald-500 transition-all duration-200 ease-out bg-opacity-75;
+  @apply text-white hover:text-cyan-500 transition-all duration-200 ease-out bg-opacity-75;
 }
 .button i {
   @apply align-middle;

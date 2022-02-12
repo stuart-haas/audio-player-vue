@@ -13,7 +13,11 @@
     </div>
     <div class="absolute bottom-1/4 w-1/2 left-1/2 transform -translate-x-1/2" ref="playerRef">
       <Tracks />
-      <ProgressBar />
+      <ProgressBar >
+        <template #default="{ mousePosition, mouseOver, activeTime }">
+          <ToolTip :position="mousePosition" :visible="mouseOver" :value="activeTime" />
+        </template>
+      </ProgressBar>
       <Controls />
     </div>
   </div>
@@ -24,13 +28,15 @@ import { provide, ref } from 'vue';
 import Tracks from './Tracks.vue';
 import ProgressBar from './ProgressBar.vue';
 import Controls from './Controls.vue';
+import ToolTip from './ToolTip.vue';
 import { useAudio, useHandleNext } from '@/helpers/hooks';
 
 export default {
   components: {
     Tracks,
     ProgressBar,
-    Controls
+    Controls,
+    ToolTip
   },
   setup() {
     const index = ref(0);

@@ -1,8 +1,8 @@
 <template>
   <div 
     @click="handleSelect"
-    :class="{ 'bg-emerald-500 bg-opacity-75' : currentIndex === index }"
-    class="py-2 px-4 hover:bg-emerald-500 transition-all duration-200 ease-out cursor-pointer grid grid-cols-2 hover:bg-opacity-75"
+    :class="{ 'bg-cyan-500 bg-opacity-75' : currentIndex === index }"
+    class="py-2 px-4 hover:bg-cyan-500 transition-all duration-200 ease-out cursor-pointer grid grid-cols-2 hover:bg-opacity-75"
   >
     <span class="text-white tracking-wide text-lg">{{ item.title }}</span>
     <span class="text-white tracking-wide text-lg">{{ item.artist }}</span>

@@ -73,6 +73,14 @@ export const useSelect = (index, newIndex, done) => {
   done();
 }
 
+export const useMousePosition = (e, offset) => {
+  const target = e.currentTarget;
+  const position = (e.pageX - target.offsetLeft - offset) / target.offsetWidth;
+  const percent = Math.abs(Math.round(position * 100));
+  
+  return { position, percent };
+}
+
 export const useSecondsToTime = (value) => {
   let nValue = value;
   if(Number.isNaN(value)) nValue = 0;
