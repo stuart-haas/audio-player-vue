@@ -110,6 +110,7 @@ export default {
     const audio = useAudio({
       autoplay: true,
       shuffled: true,
+      repeatable: true,
       shuffleAction: (value) => {
         if(value) {
           data.value = useShuffle(data.value);

@@ -1,6 +1,6 @@
 <template>
   <div class="relative top-8 w-full flex justify-center">
-    <div class="space-x-8 text-xl bg-slate-900 bg-opacity-50 px-4 py-2 rounded-lg flex justify-between items-center shadow border border-slate-500 border-opacity-50">
+    <div class="space-x-8 text-xl bg-slate-900 bg-opacity-75 px-4 py-2 rounded-lg flex justify-between items-center shadow border border-slate-500 border-opacity-50">
       <button @click="handleShuffle" class="button" :class="{ 'active' : isShuffled }"><i class="fa fa-random" /></button>
       <button @click="handleRepeat" class="button" :class="{ 'active' : isRepeating }"><i class="fa fa-sync" /></button>
       <button @click="handlePrevious" class="button"><i class="fa fa-backward" /></button>
