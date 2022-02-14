@@ -47,9 +47,10 @@ export default {
 
     function mouseUpdate(e) {
       const { position, percent } = useActiveSeek(e, offset.value);
+      mouseOver.value = true;
+      mousePosition.value = percent;
+
       if (percent >= 0 && percent <= 100) {
-        mousePosition.value = percent;
-        mouseOver.value = true;
         activeTime.value = useSecondsToTime(position * duration.value);
       }
     }

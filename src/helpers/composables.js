@@ -1,4 +1,4 @@
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, watchEffect } from 'vue';
 
 export const usePlayer = () => {
   const playerRef = ref(null);
@@ -14,7 +14,8 @@ export const useAudio = (options) => {
   const progress = ref(0);
   const currentTime = ref(0);
   const remainingTime = ref(0);
-  const isPlaying = ref(false);
+  const isPlaying = ref(true);
+  const isRepeating = ref(false);
 
   function play() {
     isPlaying.value = true;
@@ -22,6 +23,10 @@ export const useAudio = (options) => {
 
   function pause() {
     isPlaying.value = false;
+  }
+
+  function repeat(value) {
+    isRepeating.value = value;
   }
 
   function setCurrentTime(value) {
@@ -50,8 +55,11 @@ export const useAudio = (options) => {
       progress.value =  (currentTime.value / duration.value) * 100;
     });
     audioRef.value.addEventListener('ended', () => {
-      options.next({ play });
+      options.next({ play, isRepeating });
     });
+    if(isPlaying.value) {
+      audioRef.value.play();
+    }
   });
 
   return { 
@@ -62,19 +70,29 @@ export const useAudio = (options) => {
     remainingTime,
     play,
     pause,
+    repeat,
     isPlaying,
+    isRepeating,
     setCurrentTime
   }
 };
 
-export const useHandleNext = (index, data, done) => {
+export const useHandleNext = (index, data, done, isRepeating) => {
+  if(index.value === data.value.length - 1 && isRepeating.value) {
+    index.value = 0;
+    return done();
+  }
   if (index.value < data.value.length - 1) {
     index.value += 1;
     done();
   }
 }
 
-export const useHandlePrevious = (index, done) => {
+export const useHandlePrevious = (index, data, done, isRepeating) => {
+  if(index.value === 0 && isRepeating.value) {
+    index.value = data.value.length - 1;
+    return done();
+  }
   if(index.value > 0) {
     index.value -= 1;
     done();

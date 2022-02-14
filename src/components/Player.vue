@@ -75,10 +75,10 @@ export default {
 
     const player = usePlayer();
     const audio = useAudio({
-      next: ({ play }) => useHandleNext(index, data, () => {
+      next: ({ play, isRepeating }) => useHandleNext(index, data, () => {
         play();
-      }
-    )});
+      }, isRepeating)
+    });
 
     const { audioRef, isPlaying } = audio;
     const { playerRef } = player;
