@@ -87,7 +87,9 @@ export const useAudio = ({ next = null, autoplay = true, repeatable = false, shu
     });
 
     audioRef.value.addEventListener('canplay', () => {
-      play();
+      if(autoplay) {
+        play();
+      }
     });
 
     audioRef.value.addEventListener('ended', () => {
