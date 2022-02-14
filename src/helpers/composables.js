@@ -1,4 +1,4 @@
-import { ref, onMounted, watch, watchEffect } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 export const usePlayer = () => {
   const playerRef = ref(null);
@@ -8,22 +8,36 @@ export const usePlayer = () => {
   };
 }
 
-export const useAudio = ({ next = null, autoplay = true, repeatable = false, shuffled = false, shuffleAction = null }) => {
+export const useAudio = ({ next = null, autoplay = true, repeatable = false, shuffled = false, handleShuffle = null, volume = 1, muted = false }) => {
   const audioRef = ref(null);
   const duration = ref(null);
   const progress = ref(0);
   const currentTime = ref(0);
   const remainingTime = ref(0);
+  const currentVolume = ref(volume);
   const isPlaying = ref(autoplay);
   const isRepeating = ref(repeatable);
   const isShuffled = ref(shuffled);
+  const isMuted = ref(muted);
 
-  function play() {
-    isPlaying.value = true;
+  async function play() {
+    try {
+      await audioRef.value.play();
+    } catch(error) {
+      console.error(error);
+    }
   }
 
   function pause() {
-    isPlaying.value = false;
+    audioRef.value.pause();
+  }
+
+  function setCurrentTime(value) {
+    audioRef.value.currentTime = value;
+  }
+
+  function setVolume(value) {
+    audioRef.value.volume = value;
   }
 
   function repeat(value) {
@@ -32,20 +46,16 @@ export const useAudio = ({ next = null, autoplay = true, repeatable = false, shu
 
   function shuffle(value) {
     isShuffled.value = value;
-    if(shuffleAction) {
-      shuffleAction(value);
+    if(handleShuffle) {
+      handleShuffle(value);
     }
   }
 
-  function setCurrentTime(value) {
-    audioRef.value.currentTime = value;
-  }
-
-  watch(isPlaying, (value) => {
-    if(value) {
-      audioRef.value.play();
+  watch(currentVolume, (value) => {
+    if(value === 0) {
+      isMuted.value = true;
     } else {
-      audioRef.value.pause();
+      isMuted.value = false;
     }
   });
 
@@ -53,6 +63,7 @@ export const useAudio = ({ next = null, autoplay = true, repeatable = false, shu
     audioRef.value.addEventListener('loadedmetadata', () => {
       duration.value = audioRef.value.duration;
     });
+
     audioRef.value.addEventListener('timeupdate', () => {
       duration.value = audioRef.value.duration;
 
@@ -62,16 +73,31 @@ export const useAudio = ({ next = null, autoplay = true, repeatable = false, shu
 
       progress.value =  (currentTime.value / duration.value) * 100;
     });
+
+    audioRef.value.addEventListener('volumechange', () => {
+      currentVolume.value = audioRef.value.volume;
+    });
+
+    audioRef.value.addEventListener('play', () => {
+      isPlaying.value = true;
+    });
+
+    audioRef.value.addEventListener('pause', () => {
+      isPlaying.value = false;
+    });
+
+    audioRef.value.addEventListener('canplay', () => {
+      play();
+    });
+
     audioRef.value.addEventListener('ended', () => {
       if(next) {
         next({ play, isRepeating });
       }
     });
-    if(isPlaying.value) {
-      audioRef.value.play();
-    }
-    if(shuffled && shuffleAction) {
-      shuffleAction(shuffled);
+
+    if(shuffled && handleShuffle) {
+      handleShuffle(shuffled);
     }
   });
 
@@ -88,7 +114,10 @@ export const useAudio = ({ next = null, autoplay = true, repeatable = false, shu
     isRepeating,
     setCurrentTime,
     shuffle,
-    isShuffled
+    isShuffled,
+    setVolume,
+    currentVolume,
+    isMuted
   }
 };
 

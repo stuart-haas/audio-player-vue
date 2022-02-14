@@ -111,7 +111,7 @@ export default {
       autoplay: true,
       shuffled: true,
       repeatable: true,
-      shuffleAction: (value) => {
+      handleShuffle: (value) => {
         if(value) {
           data.value = useShuffle(data.value);
         } else {

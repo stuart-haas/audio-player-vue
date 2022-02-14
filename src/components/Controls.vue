@@ -7,6 +7,10 @@
       <button v-if="isPlaying" @click="pause" class="button"><i class="fa fa-pause" /></button>
       <button v-else @click="play" class="button"><i class="fa fa-play" /></button>
       <button @click="handleNext" class="button"><i class="fa fa-forward" /></button>
+      <button @click="handleVolume" class="button">
+        <i v-if="isMuted" class="fa fa-volume-mute" />
+        <i v-else class="fa fa-volume-up" />
+      </button>
     </div>
   </div>
 </template>
@@ -17,7 +21,7 @@ import { useHandleNext, useHandlePrevious } from '@/helpers/composables';
 
 export default {
   setup() {
-    const { play, pause, isPlaying, repeat, isRepeating, shuffle, isShuffled } = inject('audio');
+    const { play, pause, isPlaying, repeat, isRepeating, shuffle, isShuffled, setVolume, isMuted } = inject('audio');
     const index = inject('index');
     const data = inject('data');
 
@@ -41,6 +45,14 @@ export default {
       shuffle(!isShuffled.value);
     }
 
+    function handleVolume() {
+      if(isMuted.value) {
+        setVolume(1);
+      } else {
+        setVolume(0);
+      }
+    }
+
     return {
       play,
       pause,
@@ -51,6 +63,8 @@ export default {
       handleShuffle,
       isRepeating,
       isShuffled,
+      handleVolume,
+      isMuted
     };
   },
 }
