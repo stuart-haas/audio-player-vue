@@ -8,14 +8,15 @@ export const usePlayer = () => {
   };
 }
 
-export const useAudio = (options) => {
+export const useAudio = ({ next = null, autoplay = true, repeatable = false, shuffled = false, shuffleAction = null }) => {
   const audioRef = ref(null);
   const duration = ref(null);
   const progress = ref(0);
   const currentTime = ref(0);
   const remainingTime = ref(0);
-  const isPlaying = ref(true);
-  const isRepeating = ref(false);
+  const isPlaying = ref(autoplay);
+  const isRepeating = ref(repeatable);
+  const isShuffled = ref(shuffled);
 
   function play() {
     isPlaying.value = true;
@@ -27,6 +28,13 @@ export const useAudio = (options) => {
 
   function repeat(value) {
     isRepeating.value = value;
+  }
+
+  function shuffle(value) {
+    isShuffled.value = value;
+    if(shuffleAction) {
+      shuffleAction(value);
+    }
   }
 
   function setCurrentTime(value) {
@@ -55,10 +63,15 @@ export const useAudio = (options) => {
       progress.value =  (currentTime.value / duration.value) * 100;
     });
     audioRef.value.addEventListener('ended', () => {
-      options.next({ play, isRepeating });
+      if(next) {
+        next({ play, isRepeating });
+      }
     });
     if(isPlaying.value) {
       audioRef.value.play();
+    }
+    if(shuffled && shuffleAction) {
+      shuffleAction(shuffled);
     }
   });
 
@@ -73,7 +86,9 @@ export const useAudio = (options) => {
     repeat,
     isPlaying,
     isRepeating,
-    setCurrentTime
+    setCurrentTime,
+    shuffle,
+    isShuffled
   }
 };
 
@@ -135,4 +150,23 @@ export const useSecondsToTime = (value) => {
   }
   
   return minutes + ':' + seconds;
+}
+
+// https://bost.ocks.org/mike/shuffle/
+export const useShuffle = (array) => {
+  let currentIndex = array.length, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
 }
